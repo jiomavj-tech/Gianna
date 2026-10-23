@@ -87,10 +87,11 @@ button:focus-visible,input:focus-visible,textarea:focus-visible{outline:2px soli
 .themebtn svg{width:18px;height:18px;fill:none;stroke:currentColor;stroke-width:1.8}
 /* calendário */
 .cal-head{display:flex;align-items:center;justify-content:space-between;gap:8px}
-.cal-head h2{font-size:1.1rem;text-transform:capitalize}
+.cal-head h2{font-size:1.05rem;text-align:center;flex:1;min-width:0}
+.cal-toggle{align-self:center;font-size:.85rem;padding:6px 12px}
 .cal-grid{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:4px}
 .cal-dow{font-size:.7rem;text-align:center;color:var(--muted);font-weight:600;text-transform:uppercase;letter-spacing:.05em}
-.cal-day{border:1px solid transparent;background:none;border-radius:8px;padding:4px 0;display:flex;flex-direction:column;align-items:center;gap:3px;min-width:0}
+.cal-day{border:1px solid transparent;background:none;border-radius:8px;padding:2px 0;display:flex;flex-direction:column;align-items:center;gap:3px;min-width:0}
 .cal-day .dn{font-size:.75rem;font-variant-numeric:tabular-nums}
 .cal-day.out{opacity:.35}
 .cal-day.today .dn{font-weight:700;color:var(--accent)}
@@ -193,6 +194,7 @@ nav.tabs{position:fixed;left:0;right:0;bottom:0;background:var(--surface);border
 nav.tabs .in{display:grid;grid-template-columns:repeat(4,1fr);gap:4px;width:100%;max-width:720px}
 nav.tabs button{border:none;background:none;border-radius:10px;padding:8px 4px;font-size:.8rem;font-weight:600;color:var(--muted);display:flex;flex-direction:column;align-items:center;gap:3px}
 nav.tabs button svg{width:22px;height:22px;fill:none;stroke:currentColor;stroke-width:1.8}
+nav.tabs button:focus-visible{outline-offset:-3px}
 nav.tabs button[aria-current="page"]{color:var(--accent);background:var(--accent-soft)}
 .toast{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(84px + env(safe-area-inset-bottom, 0px));background:var(--fg);color:var(--bg);padding:10px 16px;border-radius:10px;font-weight:600;font-size:.9rem;z-index:6}
 .confirm{border:1px solid var(--st-red);border-radius:12px;padding:12px;display:flex;flex-direction:column;gap:10px}
@@ -219,6 +221,7 @@ nav.tabs button[aria-current="page"]{color:var(--accent);background:var(--accent
     <div class="panel">
       <div class="cal-head"><button class="btn" type="button" id="calPrev" aria-label="Mês anterior">‹</button><h2 id="calTitle"></h2><button class="btn" type="button" id="calNext" aria-label="Próximo mês">›</button></div>
       <div class="cal-grid" id="calGrid"></div>
+      <button class="btn ghost cal-toggle" type="button" id="calToggle">Ver mês inteiro</button>
     </div>
     <div class="panel">
       <div class="daynav">
@@ -744,25 +747,38 @@ function renderAll(){$('exampleBanner').hidden=!state.example;renderForm();rende
 function stampMap(){const m={};getCycles().forEach(c=>c.days.forEach((x,i)=>{m[x.date]=dayStamp(c,i)}));return m}
 
 /* Calendário */
+let calView='week';try{calView=localStorage.getItem('gianna-cal')||'week'}catch(err){}
+const cap=t=>t.charAt(0).toUpperCase()+t.slice(1);
 function renderCal(){
   const [y,mo]=calMonth.split('-').map(Number);
-  $('calTitle').textContent=MONTHS[mo-1]+' de '+y;
-  const first=calMonth+'-01';const wd=new Date(toUTC(first)).getUTCDay();
-  const start=addDays(first,-wd);
-  const lastDay=new Date(Date.UTC(y,mo,0)).getUTCDate();
-  const cells=Math.ceil((wd+lastDay)/7)*7;
+  let start,cells;
+  if(calView==='week'){
+    start=addDays(curDate,-new Date(toUTC(curDate)).getUTCDay());cells=7;
+    const end=addDays(start,6);
+    $('calTitle').textContent=fmt(start)+' a '+fmt(end);
+    $('calToggle').textContent='Ver mês inteiro';
+  }else{
+    $('calTitle').textContent=cap(MONTHS[mo-1])+' de '+y;
+    const first=calMonth+'-01';const wd=new Date(toUTC(first)).getUTCDay();
+    start=addDays(first,-wd);
+    const lastDay=new Date(Date.UTC(y,mo,0)).getUTCDate();
+    cells=Math.ceil((wd+lastDay)/7)*7;
+    $('calToggle').textContent='Ver só a semana';
+  }
   const map=stampMap();const t=todayStr();
   let h=['D','S','T','Q','Q','S','S'].map(d=>'<div class="cal-dow">'+d+'</div>').join('');
   for(let i=0;i<cells;i++){
     const d=addDays(start,i);const st=map[d];
-    const cls=['cal-day'];if(d.slice(0,7)!==calMonth)cls.push('out');if(d===t)cls.push('today');if(d===curDate)cls.push('sel');
+    const cls=['cal-day'];if(calView==='month'&&d.slice(0,7)!==calMonth)cls.push('out');if(d===t)cls.push('today');if(d===curDate)cls.push('sel');
     h+='<button type="button" class="'+cls.join(' ')+'" data-d="'+d+'" aria-label="'+longDate(d)+'"><span class="dn">'+Number(d.slice(8))+'</span>'+(st?stampHTML(st.color,st.baby,st.label).replace('class="stamp ','class="stamp mini '):'<span class="stamp mini none"></span>')+'</button>';
   }
   $('calGrid').innerHTML=h;
   $('calGrid').querySelectorAll('.cal-day').forEach(b=>b.onclick=()=>openDate(b.dataset.d));
 }
 function shiftMonth(n){const [y,m]=calMonth.split('-').map(Number);const d=new Date(Date.UTC(y,m-1+n,1));calMonth=d.toISOString().slice(0,7);renderCal()}
-$('calPrev').onclick=()=>shiftMonth(-1);$('calNext').onclick=()=>shiftMonth(1);
+$('calPrev').onclick=()=>calView==='week'?openDate(addDays(curDate,-7)):shiftMonth(-1);
+$('calNext').onclick=()=>calView==='week'?openDate(addDays(curDate,7)):shiftMonth(1);
+$('calToggle').onclick=()=>{calView=calView==='week'?'month':'week';calMonth=curDate.slice(0,7);try{localStorage.setItem('gianna-cal',calView)}catch(err){}renderCal()};
 
 /* Ciclos alinhados pelo Ápice */
 function alignData(){
