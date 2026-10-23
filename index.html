@@ -85,6 +85,37 @@ button:focus-visible,input:focus-visible,textarea:focus-visible{outline:2px soli
 .tog[aria-pressed="true"]{border-color:var(--accent);background:var(--accent-soft)}
 .themebtn{display:inline-flex;align-items:center;gap:6px;font-size:.85rem;padding:8px 12px}
 .themebtn svg{width:18px;height:18px;fill:none;stroke:currentColor;stroke-width:1.8}
+/* calendário */
+.cal-head{display:flex;align-items:center;justify-content:space-between;gap:8px}
+.cal-head h2{font-size:1.1rem;text-transform:capitalize}
+.cal-grid{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:4px}
+.cal-dow{font-size:.7rem;text-align:center;color:var(--muted);font-weight:600;text-transform:uppercase;letter-spacing:.05em}
+.cal-day{border:1px solid transparent;background:none;border-radius:8px;padding:4px 0;display:flex;flex-direction:column;align-items:center;gap:3px;min-width:0}
+.cal-day .dn{font-size:.75rem;font-variant-numeric:tabular-nums}
+.cal-day.out{opacity:.35}
+.cal-day.today .dn{font-weight:700;color:var(--accent)}
+.cal-day.sel{border-color:var(--accent);background:var(--accent-soft)}
+.stamp.mini{width:16px;height:21px;border-radius:3px}
+.stamp.mini svg{width:11px;height:14px}
+.stamp.mini .lbl{font-size:.48rem;right:1px;bottom:0}
+/* ciclos alinhados */
+.align{display:grid;gap:3px 2px;width:max-content;align-items:center}
+.align .al-lab{font-size:.72rem;color:var(--muted);font-variant-numeric:tabular-nums;padding-right:6px}
+.align .al-h{font-size:.6rem;color:var(--muted);text-align:center;font-variant-numeric:tabular-nums}
+.align .al-c{display:flex;justify-content:center;padding:2px 0}
+.align .pk{background:var(--accent-soft);border-radius:4px}
+/* senha */
+.lock{position:fixed;inset:0;background:var(--bg);z-index:20;display:flex;align-items:center;justify-content:center;
+  padding:max(16px, env(safe-area-inset-top, 0px)) max(16px, env(safe-area-inset-right, 0px)) max(16px, env(safe-area-inset-bottom, 0px)) max(16px, env(safe-area-inset-left, 0px))}
+.lock-box{display:flex;flex-direction:column;align-items:center;gap:16px;width:100%;max-width:320px;text-align:center}
+.lock-box h2{font-size:1.6rem}
+.dots{display:flex;gap:14px}
+.dots span{width:14px;height:14px;border-radius:50%;border:2px solid var(--accent)}
+.dots span.on{background:var(--accent)}
+.keypad{display:grid;grid-template-columns:repeat(3,72px);gap:12px;justify-content:center}
+.keypad button{height:64px;border-radius:50%;border:1px solid var(--line);background:var(--surface);font-size:1.4rem;font-weight:600;font-variant-numeric:tabular-nums}
+.keypad button.blank{visibility:hidden}
+.lock-err{color:var(--st-red);font-weight:600;min-height:1.4em}
 .field{display:flex;flex-direction:column;gap:6px}
 .field label{font-weight:700;font-size:.9rem}
 .field input{font:inherit;padding:9px 10px;border:1px solid var(--line);border-radius:10px;background:var(--bg);color:var(--fg);min-width:0}
@@ -186,6 +217,10 @@ nav.tabs button[aria-current="page"]{color:var(--accent);background:var(--accent
   <!-- HOJE -->
   <section id="v-hoje" class="view">
     <div class="panel">
+      <div class="cal-head"><button class="btn" type="button" id="calPrev" aria-label="Mês anterior">‹</button><h2 id="calTitle"></h2><button class="btn" type="button" id="calNext" aria-label="Próximo mês">›</button></div>
+      <div class="cal-grid" id="calGrid"></div>
+    </div>
+    <div class="panel">
       <div class="daynav">
         <button class="btn" id="prevDay" type="button" aria-label="Dia anterior">‹</button>
         <input type="date" id="dateInput" aria-label="Data do registro">
@@ -254,6 +289,11 @@ nav.tabs button[aria-current="page"]{color:var(--accent);background:var(--accent
       <div class="bars" id="bars"></div>
       <p class="hint">A fase pós-Ápice costuma ser a parte mais estável do ciclo. Se ela mudar muito de um ciclo para outro, leve a ficha para a instrutora.</p>
     </div>
+    <div class="panel">
+      <h2>Ciclos alinhados pelo Ápice</h2>
+      <p class="hint">Cada linha é um ciclo. A coluna destacada é o Dia Ápice. Os números mostram quantos dias antes (−) e depois (+) dele.</p>
+      <div class="sheet"><div id="align"></div></div>
+    </div>
   </section>
 
   <!-- MAIS -->
@@ -290,6 +330,12 @@ nav.tabs button[aria-current="page"]{color:var(--accent);background:var(--accent
       <p class="hint">Confirme cada código e a regra dos selos com a sua instrutora certificada. Este app só registra e organiza. Ele não diz quais dias são férteis ou inférteis.</p>
     </div>
     <div class="panel">
+      <h2>Senha do app</h2>
+      <p class="small muted" id="pinStatus"></p>
+      <div class="row" id="pinBtns"></div>
+      <p class="hint">A senha impede que outra pessoa abra o app pelo celular. Ela não criptografa os dados.</p>
+    </div>
+    <div class="panel">
       <h2>Instalar e compartilhar</h2>
       <p class="small muted" id="installHint">No Android, use o botão abaixo ou o menu do Chrome, “Instalar app”. No iPhone, abra no Safari, toque em Compartilhar e depois em “Adicionar à Tela de Início”.</p>
       <div class="row"><button class="btn primary" type="button" id="installApp" hidden>Instalar no celular</button><button class="btn" type="button" id="shareApp">Compartilhar o app</button></div>
@@ -316,6 +362,17 @@ nav.tabs button[aria-current="page"]{color:var(--accent);background:var(--accent
   </div>
 </nav>
 <div class="toast" id="toast" hidden></div>
+<div class="lock" id="lock" hidden role="dialog" aria-modal="true" aria-labelledby="lockTitle">
+  <div class="lock-box">
+    <h2 id="lockTitle">Gianna</h2>
+    <p id="lockMsg">Digite a senha</p>
+    <div class="dots" id="dots"><span></span><span></span><span></span><span></span></div>
+    <p class="lock-err" id="lockErr"></p>
+    <div class="keypad" id="keypad"></div>
+    <div class="row" style="justify-content:center"><button class="btn ghost" type="button" id="lockCancel" hidden>Cancelar</button><button class="btn ghost" type="button" id="forgot">Esqueci a senha</button></div>
+    <div id="forgotArea"></div>
+  </div>
+</div>
 
 <script src="jspdf.umd.min.js"></script>
 <script>
@@ -435,7 +492,7 @@ function suggestPeak(c){
 function cycleOf(date){return getCycles().find(c=>date>=c.start&&date<=c.end)}
 
 /* Hoje */
-let curDate=todayStr();let draft={};
+let curDate=todayStr();let draft={};let calMonth=curDate.slice(0,7);
 const $=id=>document.getElementById(id);
 function chips(el,list,isOn,onTap){
   el.innerHTML=list.map(([v,l,s])=>'<button type="button" class="chip" data-v="'+v+'" aria-pressed="'+isOn(v)+'">'+(v?'<span class="c">'+v+'</span>':'')+l+(s?' <span class="s">'+s+'</span>':'')+'</button>').join('');
@@ -467,7 +524,7 @@ function renderForm(){
   else if(isPeakType(draft)&&!draft.peak)hint='Muco do tipo Ápice. Se amanhã o padrão mudar, volte aqui e marque o Dia Ápice.';
   $('prevHint').textContent=hint;
 }
-function openDate(d){curDate=d;draft=JSON.parse(JSON.stringify(state.entries[d]||{}));renderForm()}
+function openDate(d){curDate=d;calMonth=d.slice(0,7);draft=JSON.parse(JSON.stringify(state.entries[d]||{}));renderForm();renderCal()}
 $('dateInput').onchange=e=>{if(e.target.value)openDate(e.target.value)};
 $('prevDay').onclick=()=>openDate(addDays(curDate,-1));
 $('nextDay').onclick=()=>openDate(addDays(curDate,1));
@@ -564,6 +621,26 @@ function buildPDF(name,cs){
     }
     y+=2;
   });
+  const al=cs.filter(c=>c.peak);
+  if(al.length){
+    doc.addPage();y=M;
+    doc.setFont('helvetica','bold');doc.setFontSize(12);doc.setTextColor(...ink);doc.text('Ciclos alinhados pelo Dia Ápice',M,y+5);
+    doc.setFont('helvetica','normal');doc.setFontSize(8);doc.setTextColor(...mut);doc.text('Cada linha é um ciclo. A coluna P é o Dia Ápice; os números indicam dias antes (-) e depois (+).',M,y+10);
+    y+=16;
+    const pre=Math.max(...al.map(c=>c.peak-1)),post=Math.max(...al.map(c=>c.len-c.peak)),N=pre+post+1;
+    const acw=Math.min(6,(W-2*M-16)/N),asw=acw-0.8,ash=asw*1.3,x0=M+16;
+    doc.setFillColor(216,230,235);doc.rect(x0+pre*acw-0.2,y-1,acw,4+al.length*(ash+2.5)+1,'F');
+    doc.setFontSize(5.5);
+    for(let k=-pre;k<=post;k++){if(k===0||k%5===0){doc.setTextColor(...mut);doc.text(k===0?'P':(k>0?'+':'-')+Math.abs(k),x0+(k+pre)*acw+acw/2,y+2,{align:'center'})}}
+    y+=4;
+    al.forEach(c=>{
+      if(y+ash+3>H-M-6){doc.addPage();y=M}
+      doc.setFontSize(7);doc.setTextColor(...mut);doc.text(fmt(c.start),M,y+ash*0.65);
+      for(let k=-pre;k<=post;k++){const i=c.peak-1+k;if(i<0||i>=c.len)continue;const st=dayStamp(c,i);drawStamp(doc,x0+(k+pre)*acw+0.4,y,asw,ash,st.color,st.baby,st.label)}
+      y+=ash+2.5;
+    });
+    y+=4;
+  }
   const notes=[];cs.forEach(c=>c.days.forEach(x=>{if(x.e&&(x.e.note||'').trim())notes.push(fmt(x.date)+' (dia '+x.n+' do ciclo de '+fmt(c.start)+'): '+x.e.note.trim())}));
   if(notes.length){
     if(y>H-M-20){doc.addPage();y=M}
@@ -661,7 +738,98 @@ function show(v){
 }
 document.querySelectorAll('nav.tabs button').forEach(b=>b.onclick=()=>show(b.dataset.v));
 
-function renderAll(){$('exampleBanner').hidden=!state.example;renderForm();renderCycles();renderCharts();renderBackup();renderPdfUI()}
+function renderAll(){$('exampleBanner').hidden=!state.example;renderForm();renderCycles();renderCharts();renderBackup();renderPdfUI();renderCal();renderAlign();renderPinUI()}
+
+/* Mapa de selos por data */
+function stampMap(){const m={};getCycles().forEach(c=>c.days.forEach((x,i)=>{m[x.date]=dayStamp(c,i)}));return m}
+
+/* Calendário */
+function renderCal(){
+  const [y,mo]=calMonth.split('-').map(Number);
+  $('calTitle').textContent=MONTHS[mo-1]+' de '+y;
+  const first=calMonth+'-01';const wd=new Date(toUTC(first)).getUTCDay();
+  const start=addDays(first,-wd);
+  const lastDay=new Date(Date.UTC(y,mo,0)).getUTCDate();
+  const cells=Math.ceil((wd+lastDay)/7)*7;
+  const map=stampMap();const t=todayStr();
+  let h=['D','S','T','Q','Q','S','S'].map(d=>'<div class="cal-dow">'+d+'</div>').join('');
+  for(let i=0;i<cells;i++){
+    const d=addDays(start,i);const st=map[d];
+    const cls=['cal-day'];if(d.slice(0,7)!==calMonth)cls.push('out');if(d===t)cls.push('today');if(d===curDate)cls.push('sel');
+    h+='<button type="button" class="'+cls.join(' ')+'" data-d="'+d+'" aria-label="'+longDate(d)+'"><span class="dn">'+Number(d.slice(8))+'</span>'+(st?stampHTML(st.color,st.baby,st.label).replace('class="stamp ','class="stamp mini '):'<span class="stamp mini none"></span>')+'</button>';
+  }
+  $('calGrid').innerHTML=h;
+  $('calGrid').querySelectorAll('.cal-day').forEach(b=>b.onclick=()=>openDate(b.dataset.d));
+}
+function shiftMonth(n){const [y,m]=calMonth.split('-').map(Number);const d=new Date(Date.UTC(y,m-1+n,1));calMonth=d.toISOString().slice(0,7);renderCal()}
+$('calPrev').onclick=()=>shiftMonth(-1);$('calNext').onclick=()=>shiftMonth(1);
+
+/* Ciclos alinhados pelo Ápice */
+function alignData(){
+  const cs=getCycles().filter(c=>c.peak).slice(-8);
+  if(!cs.length)return null;
+  const pre=Math.max(...cs.map(c=>c.peak-1)),post=Math.max(...cs.map(c=>c.len-c.peak));
+  return {cs,pre,post};
+}
+function renderAlign(){
+  const a=alignData();
+  if(!a){$('align').innerHTML='<p class="muted">Aparece quando houver pelo menos um ciclo com o Dia Ápice marcado.</p>';return}
+  const N=a.pre+a.post+1;
+  let h='<div class="align" style="grid-template-columns:48px repeat('+N+',18px)"><span></span>';
+  for(let k=-a.pre;k<=a.post;k++)h+='<span class="al-h'+(k===0?' pk':'')+'">'+(k===0?'P':(k%5===0?(k>0?'+':'−')+Math.abs(k):''))+'</span>';
+  a.cs.forEach(c=>{
+    h+='<span class="al-lab">'+fmt(c.start)+'</span>';
+    for(let k=-a.pre;k<=a.post;k++){const i=c.peak-1+k;let inner='';
+      if(i>=0&&i<c.len){const st=dayStamp(c,i);inner=stampHTML(st.color,st.baby,st.label).replace('class="stamp ','class="stamp mini ')}
+      h+='<span class="al-c'+(k===0?' pk':'')+'">'+inner+'</span>'}
+  });
+  $('align').innerHTML=h+'</div>';
+}
+
+/* Senha */
+const PKEY='gianna-senha';
+function getPin(){try{return localStorage.getItem(PKEY)}catch(err){return null}}
+async function hashPin(p){try{const b=await crypto.subtle.digest('SHA-256',new TextEncoder().encode('gianna:'+p));return Array.from(new Uint8Array(b)).map(x=>x.toString(16).padStart(2,'0')).join('')}catch(err){return 'p:'+p}}
+let lockMode='',entered='',firstPin='',hiddenAt=0;
+const LOCKMSG={unlock:'Digite a senha',set1:'Crie uma senha de 4 números',set2:'Digite a senha de novo para confirmar',remove:'Digite a senha atual para remover'};
+function showLock(mode){lockMode=mode;entered='';$('lockErr').textContent='';$('forgotArea').innerHTML='';$('lockMsg').textContent=LOCKMSG[mode];
+  $('lockCancel').hidden=mode==='unlock';$('forgot').hidden=mode!=='unlock';$('lock').hidden=false;drawDots()}
+function hideLock(){$('lock').hidden=true;lockMode=''}
+function drawDots(){$('dots').querySelectorAll('span').forEach((d,i)=>d.classList.toggle('on',i<entered.length))}
+$('keypad').innerHTML=['1','2','3','4','5','6','7','8','9','','0','⌫'].map(k=>'<button type="button" '+(k===''?'class="blank" tabindex="-1" aria-hidden="true"':'aria-label="'+(k==='⌫'?'Apagar':k)+'"')+' data-k="'+k+'">'+k+'</button>').join('');
+$('keypad').querySelectorAll('button').forEach(b=>b.onclick=()=>pressKey(b.dataset.k));
+document.addEventListener('keydown',e=>{if($('lock').hidden)return;if(/^[0-9]$/.test(e.key))pressKey(e.key);else if(e.key==='Backspace')pressKey('⌫')});
+async function pressKey(k){
+  if(!k)return;
+  if(k==='⌫'){entered=entered.slice(0,-1);drawDots();return}
+  if(entered.length>=4)return;
+  entered+=k;drawDots();$('lockErr').textContent='';
+  if(entered.length<4)return;
+  const p=entered;
+  if(lockMode==='set1'){firstPin=p;showLock('set2');return}
+  if(lockMode==='set2'){if(p===firstPin){try{localStorage.setItem(PKEY,await hashPin(p))}catch(err){}hideLock();renderPinUI();toast('Senha criada')}else{showLock('set1');$('lockErr').textContent='As senhas não conferem. Tente de novo.'}return}
+  const ok=(await hashPin(p))===getPin();
+  if(!ok){entered='';drawDots();$('lockErr').textContent='Senha errada';return}
+  if(lockMode==='remove'){try{localStorage.removeItem(PKEY)}catch(err){}hideLock();renderPinUI();toast('Senha removida');return}
+  hideLock();
+}
+$('lockCancel').onclick=()=>{hideLock();renderPinUI()};
+$('forgot').onclick=()=>{
+  $('forgotArea').innerHTML='<div class="confirm"><b>Entrar sem a senha apaga todos os registros deste aparelho.</b><span class="small muted">Depois você pode restaurar pelo arquivo de backup, na aba Guia.</span><div class="row" style="justify-content:center"><button class="btn danger" type="button" id="forgotYes">Apagar e entrar</button><button class="btn" type="button" id="forgotNo">Voltar</button></div></div>';
+  $('forgotYes').onclick=()=>{state={entries:{},example:false};persist();try{localStorage.removeItem(PKEY)}catch(err){}hideLock();openDate(todayStr());renderAll();toast('Registros apagados')};
+  $('forgotNo').onclick=()=>{$('forgotArea').innerHTML=''};
+};
+function renderPinUI(){
+  const has=!!getPin();
+  $('pinStatus').textContent=has?'O app pede a senha ao abrir e depois de 1 minuto fora dele.':'Nenhuma senha definida.';
+  $('pinBtns').innerHTML=has?'<button class="btn" type="button" id="pinChange">Trocar senha</button><button class="btn danger" type="button" id="pinRemove">Remover senha</button>':'<button class="btn primary" type="button" id="pinSet">Criar senha</button>';
+  if(has){$('pinChange').onclick=()=>showLock('set1');$('pinRemove').onclick=()=>showLock('remove')}else $('pinSet').onclick=()=>showLock('set1');
+}
+document.addEventListener('visibilitychange',()=>{
+  if(document.hidden)hiddenAt=Date.now();
+  else if(getPin()&&lockMode===''&&hiddenAt&&Date.now()-hiddenAt>60000)showLock('unlock');
+});
+if(getPin())showLock('unlock');
 
 /* Tema */
 const TKEY='gianna-tema';const TLAB={auto:'Automático',light:'Claro',dark:'Escuro'};
