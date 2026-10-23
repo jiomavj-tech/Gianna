@@ -1,0 +1,680 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Gianna</title>
+<meta name="theme-color" content="#2C5C70">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="icon-192.png">
+<link rel="apple-touch-icon" href="icon-180.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Gianna">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Gelasio:wght@500;600&family=Figtree:wght@400;500;600;700&family=JetBrains+Mono:wght@500;600&display=swap">
+<style>
+html{color-scheme:light}
+:root{padding-top:env(safe-area-inset-top,0px)}
+body{margin:0}
+img{max-width:100%}
+[hidden]{display:none!important}
+/* Layout: app de uma coluna para celular, abas fixas embaixo; a Ficha imita a folha de selos, uma linha por ciclo com rolagem lateral */
+:root{
+  --bg:#EEF2F1; --surface:#FFFFFF; --fg:#1C2430; --muted:#5B6672; --line:#D3DBD9;
+  --accent:#2C5C70; --accent-soft:#D8E6EB; --accent-fg:#FFFFFF;
+  --st-red:#C2413B; --st-green:#3B8752; --st-white:#FFFFFF; --st-yellow:#E3B437; --st-ink:#1C2430; --st-ink-light:#FFFFFF;
+  --warn-bg:#FBF1DA; --warn-fg:#6B4E0B;
+  --f-display:"Gelasio", Georgia, "Times New Roman", serif;
+  --f-body:"Figtree", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  --f-mono:"JetBrains Mono", ui-monospace, "SFMono-Regular", Menlo, monospace;
+}
+@media (prefers-color-scheme: dark){ :root:not([data-theme="light"]){
+  --bg:#11161B; --surface:#1A2128; --fg:#E5EAEC; --muted:#9BA6AF; --line:#2B353E;
+  --accent:#8CBBD0; --accent-soft:#213440; --accent-fg:#0F1A20;
+  --st-red:#D4544C; --st-green:#4DA264; --st-white:#F3F5F4; --st-yellow:#E6BF4C; --st-ink:#1C2430; --st-ink-light:#FFFFFF;
+  --warn-bg:#3A2F14; --warn-fg:#F1D58F; color-scheme:dark }}
+:root[data-theme="dark"]{
+  --bg:#11161B; --surface:#1A2128; --fg:#E5EAEC; --muted:#9BA6AF; --line:#2B353E;
+  --accent:#8CBBD0; --accent-soft:#213440; --accent-fg:#0F1A20;
+  --st-red:#D4544C; --st-green:#4DA264; --st-white:#F3F5F4; --st-yellow:#E6BF4C; --st-ink:#1C2430; --st-ink-light:#FFFFFF;
+  --warn-bg:#3A2F14; --warn-fg:#F1D58F; color-scheme:dark }
+
+html,body{height:100%}
+body{background:var(--bg);color:var(--fg);font-family:var(--f-body);font-size:15px;line-height:1.45;
+  padding-left:max(16px, env(safe-area-inset-left, 0px));padding-right:max(16px, env(safe-area-inset-right, 0px))}
+.wrap{max-width:720px;margin:0 auto;padding-block:18px 110px;display:flex;flex-direction:column;gap:18px}
+h1,h2,h3{font-family:var(--f-display);font-weight:600;text-wrap:balance;margin:0}
+h1{font-size:1.6rem;letter-spacing:-.01em}
+h2{font-size:1.25rem}
+h3{font-size:1rem;font-family:var(--f-body);font-weight:700}
+p{margin:0}
+.muted{color:var(--muted)}
+.small{font-size:.85rem}
+.eyebrow{font-size:.72rem;text-transform:uppercase;letter-spacing:.09em;color:var(--muted);font-weight:600}
+.top{display:flex;justify-content:space-between;align-items:flex-end;gap:12px;flex-wrap:wrap}
+.panel{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:16px;display:flex;flex-direction:column;gap:14px}
+.banner{background:var(--warn-bg);color:var(--warn-fg);border-radius:12px;padding:12px 14px;display:flex;flex-wrap:wrap;gap:10px;align-items:center;justify-content:space-between;font-size:.9rem}
+button{font:inherit;color:inherit;cursor:pointer}
+button:focus-visible,input:focus-visible,textarea:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.btn{border:1px solid var(--line);background:var(--surface);border-radius:10px;padding:9px 14px;font-weight:600}
+.btn.primary{background:var(--accent);color:var(--accent-fg);border-color:var(--accent)}
+.btn.ghost{background:transparent}
+.btn.danger{color:var(--st-red);border-color:var(--st-red);background:transparent}
+.row{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+
+/* Day nav */
+.daynav{display:flex;align-items:center;gap:8px}
+.daynav input{flex:1;min-width:0;font:inherit;padding:9px 10px;border:1px solid var(--line);border-radius:10px;background:var(--surface);color:var(--fg)}
+.daynav .btn{padding:9px 12px}
+.daylabel{font-family:var(--f-display);font-size:1.05rem}
+
+/* Chips */
+.group{display:flex;flex-direction:column;gap:8px}
+.chips{display:flex;flex-wrap:wrap;gap:6px}
+.chip{border:1px solid var(--line);background:var(--bg);border-radius:999px;padding:7px 12px;font-size:.88rem;display:inline-flex;gap:6px;align-items:baseline}
+.chip .c{font-family:var(--f-mono);font-size:.78rem;font-weight:600;color:var(--muted)}
+.chip .s{font-size:.75rem;color:var(--muted)}
+.chip[aria-pressed="true"]{background:var(--accent);border-color:var(--accent);color:var(--accent-fg)}
+.chip[aria-pressed="true"] .c,.chip[aria-pressed="true"] .s{color:var(--accent-fg);opacity:.85}
+.toggles{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:8px}
+.tog{border:1px solid var(--line);background:var(--bg);border-radius:12px;padding:10px 12px;text-align:left;display:flex;flex-direction:column;gap:2px}
+.tog b{font-size:.9rem}
+.tog span{font-size:.78rem;color:var(--muted)}
+.tog[aria-pressed="true"]{border-color:var(--accent);background:var(--accent-soft)}
+.field{display:flex;flex-direction:column;gap:6px}
+.field label{font-weight:700;font-size:.9rem}
+.field input{font:inherit;padding:9px 10px;border:1px solid var(--line);border-radius:10px;background:var(--bg);color:var(--fg);min-width:0}
+textarea{width:100%;box-sizing:border-box;font:inherit;border:1px solid var(--line);border-radius:10px;padding:10px;background:var(--bg);color:var(--fg);resize:vertical}
+
+/* Preview */
+.preview{display:flex;gap:14px;align-items:center;padding:12px;border-radius:12px;background:var(--bg)}
+.preview .code{font-family:var(--f-mono);font-size:1.2rem;font-weight:600}
+.hint{font-size:.85rem;color:var(--muted)}
+
+/* Stamp */
+.stamp{width:30px;height:38px;border-radius:5px;border:1px solid var(--line);position:relative;display:flex;align-items:center;justify-content:center;flex:none}
+.stamp.red{background:var(--st-red);border-color:var(--st-red)}
+.stamp.green{background:var(--st-green);border-color:var(--st-green)}
+.stamp.white{background:var(--st-white);border-color:#BFC8C6}
+.stamp.yellow{background:var(--st-yellow);border-color:var(--st-yellow)}
+.stamp.none{background:transparent;border-style:dashed}
+.stamp svg{width:20px;height:24px}
+.stamp .lbl{position:absolute;bottom:1px;right:3px;font-family:var(--f-mono);font-size:.62rem;font-weight:600}
+.stamp.red .lbl,.stamp.green .lbl{color:var(--st-ink-light)}
+.stamp.white .lbl,.stamp.yellow .lbl{color:var(--st-ink)}
+.stamp.big{width:44px;height:56px}
+.stamp.big svg{width:28px;height:34px}
+.baby{fill:var(--st-ink)}
+.stamp.red .baby,.stamp.green .baby{fill:var(--st-ink-light)}
+
+/* Chart sheet */
+.cycle{display:flex;flex-direction:column;gap:8px}
+.cycle-head{display:flex;justify-content:space-between;gap:8px;flex-wrap:wrap;align-items:baseline}
+.cycle-meta{font-size:.85rem;color:var(--muted);font-variant-numeric:tabular-nums}
+.sheet{overflow-x:auto;-webkit-overflow-scrolling:touch;padding-bottom:6px}
+.cells{display:flex;gap:4px;width:max-content}
+.cell{display:flex;flex-direction:column;align-items:center;gap:3px;width:42px;border:none;background:none;padding:2px 0;border-radius:6px}
+.cell:hover{background:var(--accent-soft)}
+.cell .n{font-size:.7rem;color:var(--muted);font-variant-numeric:tabular-nums}
+.cell .d{font-size:.62rem;color:var(--muted)}
+.cell .cd{font-family:var(--f-mono);font-size:.58rem;line-height:1.15;text-align:center;min-height:2.3em;word-break:break-all;max-width:42px}
+.cell .i{font-size:.62rem;font-weight:700;color:var(--accent);min-height:1em}
+.suggest{font-size:.82rem;background:var(--accent-soft);border-radius:8px;padding:6px 10px;align-self:flex-start}
+.legend{display:flex;flex-wrap:wrap;gap:12px}
+.legend div{display:flex;gap:8px;align-items:center;font-size:.85rem}
+.legend .stamp{width:22px;height:28px}
+.legend .stamp svg{width:14px;height:18px}
+
+/* Stats + bars */
+.stats{display:grid;grid-template-columns:repeat(2,1fr);gap:10px}
+@media (min-width:560px){.stats{grid-template-columns:repeat(4,1fr)}}
+.stat{display:flex;flex-direction:column;gap:2px}
+.stat b{font-family:var(--f-display);font-size:1.5rem;font-variant-numeric:tabular-nums}
+.bars{display:flex;flex-direction:column;gap:10px}
+.bar-row{display:grid;grid-template-columns:52px 1fr;gap:10px;align-items:center}
+.bar-row .lab{font-size:.8rem;color:var(--muted);font-variant-numeric:tabular-nums}
+.track{position:relative;height:26px}
+.seg{position:absolute;top:0;height:100%;display:flex;align-items:center;font-size:.72rem;font-weight:600;font-variant-numeric:tabular-nums;padding:0 6px;box-sizing:border-box;white-space:nowrap;overflow:hidden}
+.seg.pre{background:var(--accent-soft);color:var(--fg);border-radius:6px 0 0 6px}
+.seg.post{background:var(--accent);color:var(--accent-fg);border-radius:0 6px 6px 0}
+.seg.open{background:repeating-linear-gradient(45deg,var(--accent-soft),var(--accent-soft) 6px,transparent 6px,transparent 10px);color:var(--fg);border-radius:6px;border:1px dashed var(--accent)}
+.axis{display:grid;grid-template-columns:52px 1fr;gap:10px}
+.ticks{position:relative;height:18px;border-top:1px solid var(--line)}
+.ticks span{position:absolute;top:2px;font-size:.7rem;color:var(--muted);transform:translateX(-50%);font-variant-numeric:tabular-nums}
+.key{display:flex;gap:14px;flex-wrap:wrap;font-size:.82rem;color:var(--muted)}
+.key i{display:inline-block;width:12px;height:12px;border-radius:3px;vertical-align:-2px;margin-right:6px}
+
+/* Guide */
+.tbl{overflow-x:auto}
+table{border-collapse:collapse;width:100%;font-size:.88rem}
+th,td{text-align:left;padding:7px 8px;border-bottom:1px solid var(--line);vertical-align:top}
+th{font-size:.72rem;text-transform:uppercase;letter-spacing:.07em;color:var(--muted)}
+td.m{font-family:var(--f-mono);font-weight:600;white-space:nowrap}
+ol,ul{margin:0;padding-left:1.2em;display:flex;flex-direction:column;gap:6px}
+
+/* Nav */
+nav.tabs{position:fixed;left:0;right:0;bottom:0;background:var(--surface);border-top:1px solid var(--line);display:flex;justify-content:center;
+  padding:6px max(8px, env(safe-area-inset-right, 0px)) calc(6px + env(safe-area-inset-bottom, 0px)) max(8px, env(safe-area-inset-left, 0px));z-index:5}
+nav.tabs .in{display:grid;grid-template-columns:repeat(4,1fr);gap:4px;width:100%;max-width:720px}
+nav.tabs button{border:none;background:none;border-radius:10px;padding:8px 4px;font-size:.8rem;font-weight:600;color:var(--muted);display:flex;flex-direction:column;align-items:center;gap:3px}
+nav.tabs button svg{width:22px;height:22px;fill:none;stroke:currentColor;stroke-width:1.8}
+nav.tabs button[aria-current="page"]{color:var(--accent);background:var(--accent-soft)}
+.toast{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(84px + env(safe-area-inset-bottom, 0px));background:var(--fg);color:var(--bg);padding:10px 16px;border-radius:10px;font-weight:600;font-size:.9rem;z-index:6}
+.confirm{border:1px solid var(--st-red);border-radius:12px;padding:12px;display:flex;flex-direction:column;gap:10px}
+@media (prefers-reduced-motion:no-preference){.chip,.tog,.btn{transition:background .15s,border-color .15s}}
+</style>
+
+</head>
+<body>
+<div class="wrap">
+  <header class="top">
+    <div>
+      <div class="eyebrow">Ficha do ciclo · Modelo Creighton</div>
+      <h1>Gianna</h1>
+    </div>
+  </header>
+  <div id="exampleBanner" class="banner" hidden>
+    <span>Você está vendo <b>dados de exemplo</b>. O primeiro registro salvo apaga o exemplo.</span>
+    <button class="btn" id="clearExample" type="button">Apagar exemplo</button>
+  </div>
+
+  <!-- HOJE -->
+  <section id="v-hoje" class="view">
+    <div class="panel">
+      <div class="daynav">
+        <button class="btn" id="prevDay" type="button" aria-label="Dia anterior">‹</button>
+        <input type="date" id="dateInput" aria-label="Data do registro">
+        <button class="btn" id="nextDay" type="button" aria-label="Próximo dia">›</button>
+      </div>
+      <p class="daylabel" id="dayLabel"></p>
+
+      <div class="preview">
+        <div id="prevStamp"></div>
+        <div>
+          <div class="eyebrow">Código do dia</div>
+          <div class="code" id="prevCode">—</div>
+          <div class="hint" id="prevHint"></div>
+        </div>
+      </div>
+
+      <div class="group"><h3>Sangramento</h3><div class="chips" id="g-bleed"></div></div>
+      <div class="group"><h3>Sem muco</h3><div class="chips" id="g-dry"></div></div>
+      <div class="group"><h3>Com lubrificação</h3><div class="chips" id="g-lub"></div></div>
+      <div class="group"><h3>Muco: quanto estica</h3><div class="chips" id="g-mucus"></div></div>
+      <div class="group"><h3>Características do muco</h3><p class="hint">Pode marcar mais de uma. Só entram no código quando há muco (6, 8 ou 10).</p><div class="chips" id="g-mods"></div></div>
+      <div class="group"><h3>Quantas vezes no dia</h3><div class="chips" id="g-freq"></div></div>
+
+      <div class="toggles">
+        <button class="tog" type="button" id="t-newCycle" aria-pressed="false"><b>Dia 1 do ciclo</b><span>Primeiro dia de sangramento</span></button>
+        <button class="tog" type="button" id="t-peak" aria-pressed="false"><b>Dia Ápice (P)</b><span>Marque depois que passar</span></button>
+        <button class="tog" type="button" id="t-i" aria-pressed="false"><b>Relação conjugal</b><span>Aparece como “I” na ficha</span></button>
+        <button class="tog" type="button" id="t-yellow" aria-pressed="false"><b>Selo amarelo</b><span>Só se a instrutora orientar</span></button>
+      </div>
+
+      <div class="group"><h3>Anotação</h3><textarea id="note" rows="2" placeholder="Ex.: dor, viagem, sono ruim, medicamento"></textarea></div>
+
+      <div class="row">
+        <button class="btn primary" type="button" id="save">Salvar dia</button>
+        <button class="btn ghost" type="button" id="clearDay">Limpar este dia</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- FICHA -->
+  <section id="v-ficha" class="view" hidden>
+    <div class="panel">
+      <h2>Relatório para a médica</h2>
+      <p class="small muted">Gera um PDF e abre o compartilhamento do celular (WhatsApp, e-mail). O PDF traz a ficha de selos, o código de cada dia, o resumo dos ciclos e as anotações.</p>
+      <div class="field"><label for="pdfName">Nome da paciente (opcional)</label><input id="pdfName" type="text" autocomplete="name" placeholder="Ex.: Maria Silva"></div>
+      <div class="group"><h3>Ciclos no relatório</h3><div class="chips" id="g-pdfn"></div></div>
+      <div class="row"><button class="btn primary" type="button" id="sharePdf">Compartilhar PDF</button><button class="btn" type="button" id="downloadPdf">Baixar PDF</button></div>
+      <p class="hint" id="pdfMsg"></p>
+    </div>
+    <div class="panel">
+      <div class="legend" id="legend"></div>
+      <p class="hint">Toque em um dia para abrir e editar. Role cada linha para o lado.</p>
+    </div>
+    <div id="cycles" style="display:flex;flex-direction:column;gap:14px"></div>
+  </section>
+
+  <!-- GRÁFICOS -->
+  <section id="v-graf" class="view" hidden>
+    <div class="panel">
+      <h2>Resumo dos ciclos</h2>
+      <div class="stats" id="stats"></div>
+    </div>
+    <div class="panel">
+      <h2>Duração de cada ciclo</h2>
+      <div class="key"><span><i style="background:var(--accent-soft)"></i>Até o Ápice</span><span><i style="background:var(--accent)"></i>Fase pós-Ápice</span></div>
+      <div class="bars" id="bars"></div>
+      <p class="hint">A fase pós-Ápice costuma ser a parte mais estável do ciclo. Se ela mudar muito de um ciclo para outro, leve a ficha para a instrutora.</p>
+    </div>
+  </section>
+
+  <!-- MAIS -->
+  <section id="v-mais" class="view" hidden>
+    <div class="panel">
+      <h2>Como observar</h2>
+      <ol>
+        <li>Observe <b>antes e depois de cada ida ao banheiro</b>, ao longo do dia todo.</li>
+        <li>Use papel higiênico branco, dobrado, passando da frente para trás. Repare na <b>sensação</b>: seco, úmido ou lubrificante (escorregadio).</li>
+        <li>Se houver muco no papel, toque com o dedo e <b>afaste o polegar do indicador</b> para ver quanto estica. Veja a cor: turvo, claro, amarelo.</li>
+        <li>À noite, registre o <b>sinal mais fértil do dia</b> e quantas vezes ele apareceu.</li>
+        <li>O <b>Dia Ápice</b> é o último dia de muco claro, elástico ou lubrificante. Ele só é reconhecido no dia seguinte, quando o padrão muda.</li>
+      </ol>
+    </div>
+    <div class="panel">
+      <h2>Códigos usados</h2>
+      <div class="tbl"><table>
+        <thead><tr><th>Código</th><th>Significado</th></tr></thead>
+        <tbody>
+          <tr><td class="m">H · M · L · VL · B</td><td>Sangramento forte, moderado, leve, muito leve, marrom</td></tr>
+          <tr><td class="m">0</td><td>Seco</td></tr>
+          <tr><td class="m">2 · 2W · 4</td><td>Úmido, molhado, brilhante (sem lubrificação)</td></tr>
+          <tr><td class="m">10DL · 10SL · 10WL</td><td>Úmido, brilhante, molhado com lubrificação</td></tr>
+          <tr><td class="m">6</td><td>Pegajoso, estica cerca de ¼ pol. (0,6 cm)</td></tr>
+          <tr><td class="m">8</td><td>Grudento, estica ½ a ¾ pol. (1 a 2 cm)</td></tr>
+          <tr><td class="m">10</td><td>Elástico, estica 1 pol. ou mais (2,5 cm+)</td></tr>
+          <tr><td class="m">C · K · C/K</td><td>Turvo, claro, turvo/claro</td></tr>
+          <tr><td class="m">G · L · P</td><td>Gomoso, lubrificante, pastoso</td></tr>
+          <tr><td class="m">Y · B · R</td><td>Amarelo, marrom, vermelho</td></tr>
+          <tr><td class="m">X1 · X2 · X3 · AD</td><td>Visto 1, 2, 3 vezes no dia, ou o dia todo</td></tr>
+          <tr><td class="m">P · 1 · 2 · 3</td><td>Dia Ápice e os três dias de contagem depois dele</td></tr>
+        </tbody>
+      </table></div>
+      <p class="hint">Confirme cada código e a regra dos selos com a sua instrutora certificada. Este app só registra e organiza. Ele não diz quais dias são férteis ou inférteis.</p>
+    </div>
+    <div class="panel">
+      <h2>Instalar e compartilhar</h2>
+      <p class="small muted" id="installHint">No Android, use o botão abaixo ou o menu do Chrome, “Instalar app”. No iPhone, abra no Safari, toque em Compartilhar e depois em “Adicionar à Tela de Início”.</p>
+      <div class="row"><button class="btn primary" type="button" id="installApp" hidden>Instalar no celular</button><button class="btn" type="button" id="shareApp">Compartilhar o app</button></div>
+    </div>
+    <div class="panel">
+      <h2>Cópia de segurança</h2>
+      <p class="small muted">Os registros ficam só neste aparelho e neste navegador. Limpar os dados do navegador apaga tudo. Copie o texto abaixo de vez em quando e guarde, por exemplo, numa conversa sua do WhatsApp.</p>
+      <div class="row"><button class="btn" type="button" id="copyBackup">Copiar cópia de segurança</button></div>
+      <textarea id="backupOut" rows="3" readonly aria-label="Texto da cópia de segurança"></textarea>
+      <h3>Restaurar</h3>
+      <textarea id="backupIn" rows="3" placeholder="Cole aqui o texto da cópia" aria-label="Colar cópia de segurança"></textarea>
+      <div class="row"><button class="btn" type="button" id="restore">Restaurar cópia</button></div>
+      <div id="wipeArea"><button class="btn danger" type="button" id="wipe">Apagar todos os registros</button></div>
+    </div>
+  </section>
+</div>
+
+<nav class="tabs" aria-label="Seções">
+  <div class="in">
+    <button type="button" data-v="hoje" aria-current="page"><svg viewBox="0 0 24 24"><rect x="4" y="5" width="16" height="15" rx="2"/><path d="M4 10h16M9 3v4M15 3v4"/></svg>Hoje</button>
+    <button type="button" data-v="ficha"><svg viewBox="0 0 24 24"><rect x="3" y="5" width="5" height="6" rx="1"/><rect x="10" y="5" width="5" height="6" rx="1"/><rect x="17" y="5" width="4" height="6" rx="1"/><rect x="3" y="14" width="5" height="6" rx="1"/><rect x="10" y="14" width="5" height="6" rx="1"/></svg>Ficha</button>
+    <button type="button" data-v="graf"><svg viewBox="0 0 24 24"><path d="M4 19h16M7 16V9M12 16V5M17 16v-4"/></svg>Gráficos</button>
+    <button type="button" data-v="mais"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="8"/><path d="M12 11v5M12 8h.01"/></svg>Guia</button>
+  </div>
+</nav>
+<div class="toast" id="toast" hidden></div>
+
+<script src="jspdf.umd.min.js"></script>
+<script>
+(function(){
+const KEY='ficha-ciclo-creighton-v1';
+const BLEED=[['','Nenhum'],['H','Forte'],['M','Moderado'],['L','Leve'],['VL','Muito leve'],['B','Marrom']];
+const DRY=[['0','Seco'],['2','Úmido'],['2W','Molhado'],['4','Brilhante']];
+const LUB=[['10DL','Úmido'],['10SL','Brilhante'],['10WL','Molhado']];
+const MUCUS=[['6','Pegajoso','~0,6 cm'],['8','Grudento','1–2 cm'],['10','Elástico','2,5 cm+']];
+const MODS=[['C','Turvo'],['K','Claro'],['C/K','Turvo/claro'],['G','Gomoso'],['L','Lubrificante'],['P','Pastoso'],['Y','Amarelo'],['B','Marrom'],['R','Vermelho']];
+const FREQ=[['','—'],['X1','1 vez'],['X2','2 vezes'],['X3','3 vezes'],['AD','O dia todo']];
+const MUCUS_BASES=['6','8','10','10DL','10SL','10WL'];
+const BABY='<svg viewBox="0 0 20 24" aria-hidden="true"><circle class="baby" cx="10" cy="6" r="4.2"/><path class="baby" d="M3.5 13.5c0-2.4 2.9-3.6 6.5-3.6s6.5 1.2 6.5 3.6v4.2c0 2.6-2.9 4.3-6.5 4.3s-6.5-1.7-6.5-4.3z"/></svg>';
+
+const pad=n=>String(n).padStart(2,'0');
+const todayStr=()=>{const d=new Date();return d.getFullYear()+'-'+pad(d.getMonth()+1)+'-'+pad(d.getDate())};
+const toUTC=s=>{const [y,m,d]=s.split('-').map(Number);return Date.UTC(y,m-1,d)};
+const addDays=(s,n)=>new Date(toUTC(s)+n*864e5).toISOString().slice(0,10);
+const diff=(a,b)=>Math.round((toUTC(b)-toUTC(a))/864e5);
+const fmt=s=>s.slice(8,10)+'/'+s.slice(5,7);
+const WEEK=['domingo','segunda','terça','quarta','quinta','sexta','sábado'];
+const MONTHS=['janeiro','fevereiro','março','abril','maio','junho','julho','agosto','setembro','outubro','novembro','dezembro'];
+const longDate=s=>{const d=new Date(toUTC(s));return WEEK[d.getUTCDay()]+', '+d.getUTCDate()+' de '+MONTHS[d.getUTCMonth()]};
+
+let state={entries:{},example:false};
+
+function makeExample(){
+  const E={};const t=todayStr();
+  const c2=addDays(t,-22), c1=addDays(c2,-29);
+  function cyc(start,len,p,iDays){
+    for(let n=1;n<=len;n++){
+      const d=addDays(start,n-1); let e={};
+      if(n===1)e={b:'H',newCycle:true};
+      else if(n===2)e={b:'H'};else if(n===3)e={b:'M'};else if(n===4)e={b:'L',base:'0'};else if(n===5)e={b:'VL',base:'0'};
+      else if(n===p-5)e={base:'6',mods:['C'],f:'X1'};
+      else if(n===p-4)e={base:'6',mods:['C'],f:'X2'};
+      else if(n===p-3)e={base:'8',mods:['C'],f:'X2'};
+      else if(n===p-2)e={base:'10',mods:['C','K'],f:'X2'};
+      else if(n===p-1)e={base:'10',mods:['K'],f:'X3'};
+      else if(n===p)e={base:'10',mods:['K','L'],f:'AD',peak:true};
+      else if(n===p+1)e={base:'6',mods:['C'],f:'X1'};
+      else if(n>p+1&&n===len-1)e={base:'2',f:'X1'};
+      else e={base:'0',f:'AD'};
+      if(iDays.includes(n))e.i=true;
+      if(toUTC(d)<=toUTC(t))E[d]=e;
+    }
+  }
+  cyc(c1,29,15,[8,20,24]); cyc(c2,40,16,[7,21]);
+  return E;
+}
+function load(){
+  try{const raw=localStorage.getItem(KEY);if(raw){const s=JSON.parse(raw);if(s&&s.entries){state=s;return}}}catch(err){}
+  state={entries:makeExample(),example:true};
+}
+function persist(){try{localStorage.setItem(KEY,JSON.stringify(state))}catch(err){toast('Não foi possível salvar neste navegador')}}
+
+function isMucus(e){return !!e&&MUCUS_BASES.includes(e.base)}
+function isPeakType(e){return !!e&&(e.base==='10'||e.base==='10DL'||e.base==='10SL'||e.base==='10WL'||(isMucus(e)&&(e.mods||[]).some(m=>m==='K'||m==='L')))}
+function isEmpty(e){return !e||(!e.b&&!e.base&&!e.f&&!e.i&&!e.newCycle&&!e.peak&&!e.yellow&&!(e.note||'').trim()&&!(e.mods||[]).length)}
+function codeOf(e){
+  if(!e)return '';const p=[];
+  if(e.b)p.push(e.b);
+  let o=e.base||'';
+  if(o&&['6','8','10'].includes(o)&&(e.mods||[]).length)o+=e.mods.join('');
+  if(o)p.push(o);if(e.f)p.push(e.f);
+  return p.join(' ');
+}
+function baseColor(e){
+  if(!e)return 'none';
+  if(e.b)return 'red';
+  if(e.yellow)return 'yellow';
+  if(isMucus(e))return 'white';
+  if(e.base)return 'green';
+  return 'none';
+}
+function stampHTML(color,baby,label,big){
+  return '<span class="stamp '+color+(big?' big':'')+'" aria-hidden="true">'+(baby?BABY:'')+(label?'<span class="lbl">'+label+'</span>':'')+'</span>';
+}
+
+/* Cycles */
+function getCycles(){
+  const dates=Object.keys(state.entries).filter(d=>!isEmpty(state.entries[d])).sort();
+  if(!dates.length)return [];
+  const starts=dates.filter(d=>state.entries[d].newCycle);
+  if(!starts.length||starts[0]>dates[0])starts.unshift(dates[0]);
+  const today=todayStr();const out=[];
+  starts.forEach((s,k)=>{
+    const next=starts[k+1];
+    const lastEntry=dates.filter(d=>d>=s&&(!next||d<next)).pop()||s;
+    const end=next?addDays(next,-1):(lastEntry>today?lastEntry:today);
+    const len=diff(s,end)+1;const days=[];
+    for(let i=0;i<len;i++){const d=addDays(s,i);days.push({date:d,n:i+1,e:state.entries[d]})}
+    const pi=days.findIndex(x=>x.e&&x.e.peak);
+    out.push({start:s,end,len,complete:!!next,days,peak:pi>=0?pi+1:null});
+  });
+  return out;
+}
+function dayStamp(c,i){
+  const x=c.days[i];const e=x.e;let color=baseColor(e);let baby=isMucus(e)&&color!=='red';let label='';
+  if(c.peak){const k=(i+1)-c.peak;
+    if(k===0){label='P';baby=true}
+    else if(k>=1&&k<=3){label=String(k);baby=true}
+  }
+  return {color,baby,label};
+}
+function suggestPeak(c){
+  if(c.peak)return null;
+  for(let i=c.days.length-1;i>=0;i--){
+    const e=c.days[i].e;
+    if(isPeakType(e)){
+      const later=c.days.slice(i+1).some(y=>y.e&&!isEmpty(y.e)&&!isPeakType(y.e));
+      return later?c.days[i]:null;
+    }
+  }
+  return null;
+}
+function cycleOf(date){return getCycles().find(c=>date>=c.start&&date<=c.end)}
+
+/* Hoje */
+let curDate=todayStr();let draft={};
+const $=id=>document.getElementById(id);
+function chips(el,list,isOn,onTap){
+  el.innerHTML=list.map(([v,l,s])=>'<button type="button" class="chip" data-v="'+v+'" aria-pressed="'+isOn(v)+'">'+(v?'<span class="c">'+v+'</span>':'')+l+(s?' <span class="s">'+s+'</span>':'')+'</button>').join('');
+  el.querySelectorAll('.chip').forEach(b=>b.onclick=()=>{onTap(b.dataset.v);renderForm()});
+}
+function setBase(v){draft.base=draft.base===v?'':v}
+function renderForm(){
+  $('dateInput').value=curDate;
+  const c=cycleOf(curDate);
+  $('dayLabel').textContent=longDate(curDate)+(c&&!(draft.newCycle&&curDate!==c.start)?' · dia '+(diff(c.start,curDate)+1)+' do ciclo':'');
+  chips($('g-bleed'),BLEED,v=>(draft.b||'')===v,v=>{draft.b=v});
+  chips($('g-dry'),DRY,v=>draft.base===v,setBase);
+  chips($('g-lub'),LUB.map(([v,l])=>[v,l]),v=>draft.base===v,setBase);
+  chips($('g-mucus'),MUCUS,v=>draft.base===v,setBase);
+  chips($('g-mods'),MODS,v=>(draft.mods||[]).includes(v),v=>{const m=new Set(draft.mods||[]);m.has(v)?m.delete(v):m.add(v);draft.mods=MODS.map(x=>x[0]).filter(x=>m.has(x))});
+  chips($('g-freq'),FREQ,v=>(draft.f||'')===v,v=>{draft.f=v});
+  [['t-newCycle','newCycle'],['t-peak','peak'],['t-i','i'],['t-yellow','yellow']].forEach(([id,k])=>{
+    const b=$(id);b.setAttribute('aria-pressed',!!draft[k]);b.onclick=()=>{draft[k]=!draft[k];renderForm()};
+  });
+  if(document.activeElement!==$('note'))$('note').value=draft.note||'';
+  // preview
+  let color=baseColor(draft),baby=isMucus(draft)&&color!=='red',label=draft.peak?'P':'';
+  if(draft.peak)baby=true;
+  if(c&&c.peak&&!draft.peak){const k=diff(c.start,curDate)+1-c.peak;if(k>=1&&k<=3){baby=true;label=String(k)}}
+  $('prevStamp').innerHTML=stampHTML(color,baby,label,true);
+  const code=codeOf(draft);$('prevCode').textContent=(code||'—')+(draft.i?'  I':'');
+  let hint='';
+  if(!code)hint='Escolha o sangramento ou a observação do dia.';
+  else if(isPeakType(draft)&&!draft.peak)hint='Muco do tipo Ápice. Se amanhã o padrão mudar, volte aqui e marque o Dia Ápice.';
+  $('prevHint').textContent=hint;
+}
+function openDate(d){curDate=d;draft=JSON.parse(JSON.stringify(state.entries[d]||{}));renderForm()}
+$('dateInput').onchange=e=>{if(e.target.value)openDate(e.target.value)};
+$('prevDay').onclick=()=>openDate(addDays(curDate,-1));
+$('nextDay').onclick=()=>openDate(addDays(curDate,1));
+$('note').oninput=e=>{draft.note=e.target.value};
+$('save').onclick=()=>{
+  let msg='Dia salvo';
+  if(state.example){state={entries:{},example:false};msg='Exemplo apagado. Dia salvo'}
+  if(draft.peak){const c=cycleOf(curDate);if(c)c.days.forEach(x=>{if(x.date!==curDate&&state.entries[x.date])delete state.entries[x.date].peak})}
+  if(isEmpty(draft))delete state.entries[curDate];else state.entries[curDate]=JSON.parse(JSON.stringify(draft));
+  persist();renderAll();toast(msg);
+};
+$('clearDay').onclick=()=>{draft={};renderForm()};
+
+/* Ficha */
+function renderLegend(){
+  $('legend').innerHTML=[
+    ['red',false,'','Sangramento'],['green',false,'','Seco'],['white',true,'','Muco'],
+    ['green',true,'2','Contagem pós-Ápice, seco'],['white',true,'P','Dia Ápice'],['yellow',false,'','Amarelo (orientado)']
+  ].map(([c,b,l,t])=>'<div>'+stampHTML(c,b,l)+t+'</div>').join('');
+}
+function renderCycles(){
+  const cs=getCycles().slice().reverse();
+  if(!cs.length){$('cycles').innerHTML='<div class="panel"><h3>Nenhum dia registrado</h3><p class="muted">Abra a aba Hoje, marque o primeiro dia de sangramento como “Dia 1 do ciclo” e salve.</p></div>';return}
+  $('cycles').innerHTML=cs.map((c,ci)=>{
+    const sug=suggestPeak(c);
+    const meta=[c.len+' dias'+(c.complete?'':' até agora')];
+    if(c.peak)meta.push('Ápice no dia '+c.peak);
+    if(c.peak&&c.complete)meta.push('pós-Ápice '+(c.len-c.peak)+' dias');
+    const cells=c.days.map((x,i)=>{const s=dayStamp(c,i);
+      return '<button type="button" class="cell" data-d="'+x.date+'" aria-label="Dia '+x.n+', '+fmt(x.date)+(codeOf(x.e)?', '+codeOf(x.e):'')+'"><span class="n">'+x.n+'</span>'+stampHTML(s.color,s.baby,s.label)+'<span class="cd">'+(codeOf(x.e)||'')+'</span><span class="i">'+(x.e&&x.e.i?'I':'')+'</span><span class="d">'+fmt(x.date)+'</span></button>'}).join('');
+    return '<div class="panel cycle"><div class="cycle-head"><h2>Ciclo de '+fmt(c.start)+'</h2><span class="cycle-meta">'+meta.join(' · ')+'</span></div>'+
+      (sug?'<span class="suggest">Ápice provável: dia '+sug.n+' ('+fmt(sug.date)+'). Confirme e marque no dia.</span>':'')+
+      '<div class="sheet"><div class="cells">'+cells+'</div></div></div>';
+  }).join('');
+  $('cycles').querySelectorAll('.cell').forEach(b=>b.onclick=()=>{openDate(b.dataset.d);show('hoje')});
+}
+
+/* PDF */
+let pdfN='3';
+function renderPdfUI(){
+  chips($('g-pdfn'),[['3','Últimos 3'],['6','Últimos 6'],['all','Todos']],v=>pdfN===v,v=>{pdfN=v;renderPdfUI()});
+  if(document.activeElement!==$('pdfName'))$('pdfName').value=state.pdfName||'';
+}
+$('pdfName').oninput=e=>{state.pdfName=e.target.value;persist()};
+const RGB={red:[194,65,59],green:[59,135,82],white:[255,255,255],yellow:[227,180,55]};
+function buildPDF(name,cs){
+  const {jsPDF}=window.jspdf;
+  const doc=new jsPDF({orientation:'landscape',unit:'mm',format:'a4'});
+  const W=297,H=210,M=10,COLS=35,cw=(W-2*M-14)/COLS,sw=cw-1.4,sh=8;
+  const ink=[28,36,48],mut=[91,102,114];
+  let y=M;
+  doc.setTextColor(...ink);doc.setFont('helvetica','bold');doc.setFontSize(15);
+  doc.text('Ficha do Ciclo - Modelo Creighton',M,y+5);
+  doc.setFont('helvetica','normal');doc.setFontSize(9);doc.setTextColor(...mut);
+  const t=todayStr();
+  doc.text('Paciente: '+(name||'________________________')+'     Gerado em '+t.slice(8,10)+'/'+t.slice(5,7)+'/'+t.slice(0,4)+'     Ciclos no relatório: '+cs.length,M,y+11);
+  const done=cs.filter(c=>c.complete),wp=done.filter(c=>c.peak);
+  const avg=a=>a.length?(a.reduce((s,v)=>s+v,0)/a.length):null;
+  const posts=wp.map(c=>c.len-c.peak);
+  const aL=avg(done.map(c=>c.len)),aP=avg(wp.map(c=>c.peak));
+  doc.text('Duração média: '+(aL?aL.toFixed(1).replace('.',',')+' dias':'-')+'     Ápice médio: '+(aP?'dia '+aP.toFixed(0):'-')+'     Fase pós-Ápice: '+(posts.length?Math.min(...posts)+' a '+Math.max(...posts)+' dias':'-'),M,y+16);
+  y+=22;
+  // legend
+  let lx=M;doc.setFontSize(7.5);
+  [['red',0,'','Sangramento'],['green',0,'','Seco'],['white',1,'','Muco'],['white',1,'P','Dia Ápice'],['green',1,'2','Contagem pós-Ápice'],['yellow',0,'','Amarelo']].forEach(([c,b,l,txt])=>{
+    drawStamp(doc,lx,y,4.5,6,c,b,l);doc.setTextColor(...mut);doc.text(txt,lx+6,y+4);lx+=6+doc.getTextWidth(txt)+6;
+  });
+  doc.text('I = relação conjugal',lx,y+4);
+  y+=11;
+  cs.forEach(c=>{
+    const rows=Math.ceil(c.len/COLS),need=7+rows*22;
+    if(y+need>H-M-6){doc.addPage();y=M}
+    doc.setFont('helvetica','bold');doc.setFontSize(10);doc.setTextColor(...ink);
+    const meta=[c.len+' dias'+(c.complete?'':' (em andamento)')];
+    if(c.peak)meta.push('Ápice no dia '+c.peak);
+    if(c.peak&&c.complete)meta.push('pós-Ápice '+(c.len-c.peak)+' dias');
+    doc.text('Ciclo iniciado em '+c.start.slice(8,10)+'/'+c.start.slice(5,7)+'/'+c.start.slice(0,4),M,y+4);
+    doc.setFont('helvetica','normal');doc.setFontSize(8.5);doc.setTextColor(...mut);
+    doc.text(meta.join('  ·  '),M+70,y+4);
+    y+=7;
+    for(let r=0;r<rows;r++){
+      for(let k=0;k<COLS;k++){
+        const i=r*COLS+k;if(i>=c.len)break;
+        const x=M+14+k*cw,cx=x+sw/2,x0=x+0.7,day=c.days[i],s=dayStamp(c,i);
+        doc.setFontSize(6);doc.setTextColor(...mut);doc.text(String(day.n),cx,y+2.5,{align:'center'});
+        drawStamp(doc,x0,y+3.5,sw,sh,s.color,s.baby,s.label);
+        const code=codeOf(day.e);
+        if(code){doc.setFontSize(4.6);doc.setTextColor(...ink);doc.text(code.split(' '),cx,y+14,{align:'center',lineHeightFactor:1.1})}
+        if(day.e&&day.e.i){doc.setFontSize(5.5);doc.setFont('helvetica','bold');doc.text('I',cx,y+19.2,{align:'center'});doc.setFont('helvetica','normal')}
+        doc.setFontSize(4.2);doc.setTextColor(...mut);doc.text(fmt(day.date),cx,y+21.4,{align:'center'});
+      }
+      doc.setFontSize(6);doc.setTextColor(...mut);doc.text('Dia',M,y+2.5);doc.text('Código',M,y+14);doc.text('Data',M,y+21.4);
+      y+=22;
+    }
+    y+=2;
+  });
+  const notes=[];cs.forEach(c=>c.days.forEach(x=>{if(x.e&&(x.e.note||'').trim())notes.push(fmt(x.date)+' (dia '+x.n+' do ciclo de '+fmt(c.start)+'): '+x.e.note.trim())}));
+  if(notes.length){
+    if(y>H-M-20){doc.addPage();y=M}
+    doc.setFont('helvetica','bold');doc.setFontSize(10);doc.setTextColor(...ink);doc.text('Anotações',M,y+4);y+=8;
+    doc.setFont('helvetica','normal');doc.setFontSize(8);
+    notes.forEach(n=>{const lines=doc.splitTextToSize(n,W-2*M);if(y+lines.length*4>H-M-6){doc.addPage();y=M}doc.text(lines,M,y);y+=lines.length*4+1});
+  }
+  const pages=doc.getNumberOfPages();
+  for(let p=1;p<=pages;p++){doc.setPage(p);doc.setFontSize(6.5);doc.setTextColor(...mut);
+    doc.text('Registro feito pela própria usuária, com os códigos de observação do Modelo Creighton. Página '+p+' de '+pages+'.',M,H-5)}
+  return doc.output('blob');
+}
+function drawStamp(doc,x,y,w,h,color,baby,label){
+  if(color==='none'){doc.setDrawColor(190,198,196);doc.setLineDashPattern([0.6,0.6],0);doc.rect(x,y,w,h,'S');doc.setLineDashPattern([],0);return}
+  doc.setFillColor(...RGB[color]);
+  if(color==='white')doc.setDrawColor(150,160,158);else doc.setDrawColor(...RGB[color]);
+  doc.setLineWidth(0.2);doc.roundedRect(x,y,w,h,0.8,0.8,'FD');
+  const light=color==='red'||color==='green';const fg=light?[255,255,255]:[28,36,48];
+  if(baby){doc.setFillColor(...fg);const cx=x+w/2;doc.circle(cx,y+h*0.3,w*0.13,'F');doc.ellipse(cx,y+h*0.64,w*0.24,h*0.2,'F')}
+  if(label){doc.setTextColor(...fg);doc.setFont('helvetica','bold');doc.setFontSize(w>5?6:4.5);doc.text(label,x+w-0.6,y+h-0.7,{align:'right'});doc.setFont('helvetica','normal')}
+}
+function preparePdf(){
+  const msg=$('pdfMsg');
+  let cs=getCycles();
+  if(!cs.length){msg.textContent='Ainda não há dias registrados para gerar o relatório.';return null}
+  if(pdfN!=='all')cs=cs.slice(-Number(pdfN));
+  if(!window.jspdf){msg.textContent='O gerador de PDF não carregou. Abra o app de novo com internet uma vez.';return null}
+  try{const blob=buildPDF((state.pdfName||'').trim(),cs);return new File([blob],'ficha-ciclo-'+todayStr()+'.pdf',{type:'application/pdf'})}
+  catch(err){msg.textContent='Não foi possível gerar o PDF.';return null}
+}
+function downloadFile(f){const u=URL.createObjectURL(f);const a=document.createElement('a');a.href=u;a.download=f.name;document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(u),5000)}
+$('sharePdf').onclick=async()=>{
+  const f=preparePdf();if(!f)return;const msg=$('pdfMsg');
+  if(navigator.canShare&&navigator.canShare({files:[f]})){
+    try{await navigator.share({files:[f],title:'Ficha do Ciclo',text:'Ficha do ciclo para a consulta.'});msg.textContent='PDF compartilhado.';return}
+    catch(err){if(err&&err.name==='AbortError'){msg.textContent='Compartilhamento cancelado.';return}}
+  }
+  downloadFile(f);msg.textContent='Este aparelho não abriu o compartilhamento. O PDF foi baixado; envie pelo WhatsApp a partir dos arquivos.';
+};
+$('downloadPdf').onclick=()=>{const f=preparePdf();if(f){downloadFile(f);$('pdfMsg').textContent='PDF baixado.'}};
+
+/* Gráficos */
+function renderCharts(){
+  const cs=getCycles();
+  const done=cs.filter(c=>c.complete);
+  const withPeak=done.filter(c=>c.peak);
+  const avg=a=>a.length?(a.reduce((s,v)=>s+v,0)/a.length):null;
+  const aL=avg(done.map(c=>c.len)),aP=avg(withPeak.map(c=>c.peak));
+  const posts=withPeak.map(c=>c.len-c.peak);
+  const stat=(v,l)=>'<div class="stat"><span class="eyebrow">'+l+'</span><b>'+v+'</b></div>';
+  $('stats').innerHTML=stat(done.length,'Ciclos completos')+stat(aL?aL.toFixed(1).replace('.',',')+' d':'—','Duração média')+stat(aP?'dia '+aP.toFixed(0):'—','Ápice médio')+stat(posts.length?Math.min(...posts)+'–'+Math.max(...posts)+' d':'—','Pós-Ápice');
+  const list=cs.slice(-8);
+  if(!list.length){$('bars').innerHTML='<p class="muted">Os gráficos aparecem depois do primeiro ciclo registrado.</p>';return}
+  const max=Math.max(40,Math.ceil(Math.max(...list.map(c=>c.len))/10)*10);
+  const pct=v=>(v/max*100)+'%';
+  let html=list.map(c=>{
+    let segs='';
+    if(c.peak){
+      segs+='<div class="seg pre" style="left:0;width:'+pct(c.peak)+'">'+c.peak+'</div>';
+      const post=c.len-c.peak;
+      if(post>0)segs+='<div class="seg post" style="left:'+pct(c.peak)+';width:'+pct(post)+'">'+post+(c.complete?'':'…')+'</div>';
+    }else segs+='<div class="seg open" style="left:0;width:'+pct(c.len)+'">'+c.len+(c.complete?'':' em andamento')+'</div>';
+    return '<div class="bar-row"><span class="lab">'+fmt(c.start)+'</span><div class="track" role="img" aria-label="Ciclo de '+fmt(c.start)+': '+c.len+' dias'+(c.peak?', Ápice no dia '+c.peak:'')+'">'+segs+'</div></div>';
+  }).join('');
+  let ticks='';for(let v=0;v<=max;v+=10)ticks+='<span style="left:'+pct(v)+'">'+v+'</span>';
+  html+='<div class="axis"><span></span><div class="ticks">'+ticks+'</div></div>';
+  $('bars').innerHTML=html;
+}
+
+/* Backup */
+function renderBackup(){$('backupOut').value=JSON.stringify(state)}
+$('copyBackup').onclick=()=>{
+  const t=$('backupOut');
+  navigator.clipboard.writeText(t.value).then(()=>toast('Cópia copiada')).catch(()=>{t.focus();t.select();toast('Texto selecionado. Copie manualmente')});
+};
+$('restore').onclick=()=>{
+  try{const s=JSON.parse($('backupIn').value);if(!s||typeof s.entries!=='object')throw 0;state={entries:s.entries,example:false};persist();$('backupIn').value='';renderAll();toast('Cópia restaurada')}
+  catch(err){toast('Texto inválido. Cole a cópia inteira, sem alterar')}
+};
+function wipeIdle(){$('wipeArea').innerHTML='<button class="btn danger" type="button" id="wipe">Apagar todos os registros</button>';$('wipe').onclick=wipeAsk}
+function wipeAsk(){
+  $('wipeArea').innerHTML='<div class="confirm"><b>Apagar todos os registros deste aparelho?</b><span class="small muted">Isso não pode ser desfeito. Faça uma cópia antes.</span><div class="row"><button class="btn danger" type="button" id="wipeYes">Apagar tudo</button><button class="btn" type="button" id="wipeNo">Cancelar</button></div></div>';
+  $('wipeYes').onclick=()=>{state={entries:{},example:false};persist();wipeIdle();openDate(todayStr());renderAll();toast('Registros apagados')};
+  $('wipeNo').onclick=wipeIdle;
+}
+$('wipe').onclick=wipeAsk;
+$('clearExample').onclick=()=>{state={entries:{},example:false};persist();openDate(todayStr());renderAll();toast('Exemplo apagado')};
+
+/* Nav + toast */
+let tt;function toast(m){const t=$('toast');t.textContent=m;t.hidden=false;clearTimeout(tt);tt=setTimeout(()=>t.hidden=true,2200)}
+function show(v){
+  document.querySelectorAll('.view').forEach(s=>s.hidden=s.id!=='v-'+v);
+  document.querySelectorAll('nav.tabs button').forEach(b=>b.dataset.v===v?b.setAttribute('aria-current','page'):b.removeAttribute('aria-current'));
+  window.scrollTo(0,0);
+}
+document.querySelectorAll('nav.tabs button').forEach(b=>b.onclick=()=>show(b.dataset.v));
+
+function renderAll(){$('exampleBanner').hidden=!state.example;renderForm();renderCycles();renderCharts();renderBackup();renderPdfUI()}
+
+/* PWA */
+let deferred=null;
+window.addEventListener('beforeinstallprompt',e=>{e.preventDefault();deferred=e;$('installApp').hidden=false});
+$('installApp').onclick=async()=>{if(!deferred)return;deferred.prompt();try{await deferred.userChoice}catch(err){}deferred=null;$('installApp').hidden=true};
+window.addEventListener('appinstalled',()=>{$('installApp').hidden=true;toast('App instalado')});
+$('shareApp').onclick=async()=>{
+  const url=location.href.split('#')[0];
+  if(navigator.share){try{await navigator.share({title:'Gianna',text:'App para registrar o ciclo',url});return}catch(err){if(err&&err.name==='AbortError')return}}
+  try{await navigator.clipboard.writeText(url);toast('Link copiado')}catch(err){toast(url)}
+};
+if('serviceWorker' in navigator){window.addEventListener('load',()=>navigator.serviceWorker.register('sw.js').catch(()=>{}))}
+load();renderLegend();openDate(todayStr());renderAll();
+const h=(location.hash||'').slice(1);if(['hoje','ficha','graf','mais'].includes(h))show(h);
+})();
+</script>
+
+</body>
+</html>
